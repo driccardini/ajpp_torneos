@@ -289,10 +289,6 @@ def render_app() -> None:
     modern_styles()
 
     st.markdown('<div class="main-title">Cuadro AJPP</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="subtitle">Visualización moderna del cuadro del torneo.</div>',
-        unsafe_allow_html=True,
-    )
 
     with st.sidebar:
         st.header("Fuente")
