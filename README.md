@@ -1,45 +1,45 @@
-# AJPP Draw Viewer (Streamlit)
+# Cuadro AJPP (Streamlit)
 
-Modern personal webpage to publish and explore an AJPP tournament draw from Padelnetwork.
+Web personal moderna para publicar y explorar cuadros de torneos AJPP desde Padelnetwork.
 
-## Features
+## Funcionalidades
 
-- Fetches draw data directly from the tournament URL
-- Renders a FIFA-style knockout bracket layout
-- Includes official source draw images as a fallback/secondary view
-- Displays schedule and score data when available
+- Obtiene datos del cuadro directamente desde la URL del torneo
+- Muestra el cuadro en formato eliminación directa estilo mundial
+- Incluye imágenes oficiales del cuadro como vista secundaria
+- Muestra horarios y resultados cuando están disponibles
 
-## Run locally
+## Ejecutar en local
 
-1. Install dependencies:
+1. Instalar dependencias:
 
 	```bash
 	pip install -e .
 	```
 
-2. Start Streamlit:
+2. Iniciar Streamlit:
 
 	```bash
 	streamlit run streamlit_app.py
 	```
 
-3. Open the local URL shown in terminal (usually `http://localhost:8501`).
+3. Abrir la URL local que muestra la terminal (generalmente `http://localhost:8501`).
 
-## Notes
+## Notas
 
-- The default source points to your shared AJPP draw page.
-- You can replace the URL from the app sidebar with any compatible AJPP draw URL.
+- La fuente por defecto apunta al cuadro AJPP que compartiste.
+- Podés reemplazar la URL desde la barra lateral por cualquier cuadro AJPP compatible.
 
-## Deploy on Streamlit Community Cloud
+## Despliegue en Streamlit Community Cloud
 
-1. Push this project to a GitHub repository.
-2. Open https://share.streamlit.io and sign in with GitHub.
-3. Click **Create app**.
-4. Select your repository and branch.
-5. Set **Main file path** to `streamlit_app.py`.
-6. Click **Deploy**.
+1. Subir este proyecto a un repositorio en GitHub.
+2. Abrir https://share.streamlit.io e iniciar sesión con GitHub.
+3. Hacer clic en **Create app**.
+4. Seleccionar repositorio y rama.
+5. Configurar **Main file path** como `streamlit_app.py`.
+6. Hacer clic en **Deploy**.
 
-### Deployment files included
+### Archivos de despliegue incluidos
 
 - `streamlit_app.py` (cloud entrypoint)
 - `requirements.txt` (dependencies)

@@ -239,7 +239,7 @@ def split_matchup(players: str) -> tuple[str, str]:
         return f"{chunks[0]} / {chunks[1]}", f"{chunks[2]} / {chunks[3]}"
     if len(chunks) >= 2:
         return chunks[0], chunks[1]
-    return players, "TBD"
+    return players, "Por definir"
 
 
 def render_bracket(matches: list[Match]) -> None:
@@ -258,7 +258,7 @@ def render_bracket(matches: list[Match]) -> None:
         top_offset = max(8, (2**round_index - 1) * 16)
         gap = max(12, (2**(round_index + 1) - 1) * 18)
         html_parts.append('<div class="round-column">')
-        html_parts.append(f'<div class="round-title">Round {round_label}</div>')
+        html_parts.append(f'<div class="round-title">Ronda {round_label}</div>')
         html_parts.append(f'<div style="margin-top:{top_offset}px;">')
 
         for idx, match in enumerate(matches_by_round[round_label]):
@@ -269,11 +269,11 @@ def render_bracket(matches: list[Match]) -> None:
                 (
                     '<div class="match-box" '
                     f'style="margin-bottom:{gap if idx < len(matches_by_round[round_label]) - 1 else 0}px;">'
-                    f'<div class="match-title">Match {match.number}</div>'
+                    f'<div class="match-title">Partido {match.number}</div>'
                     f'<div class="team-line">{team_a}</div>'
                     '<div class="team-line">vs</div>'
                     f'<div class="team-line">{team_b}</div>'
-                    f'<div class="match-meta">Score: {score_value} · Time: {schedule_value}</div>'
+                    f'<div class="match-meta">Resultado: {score_value} · Horario: {schedule_value}</div>'
                     '</div>'
                 )
             )
@@ -285,56 +285,55 @@ def render_bracket(matches: list[Match]) -> None:
 
 
 def render_app() -> None:
-    st.set_page_config(page_title="AJPP Draw Viewer", page_icon="🎾", layout="wide")
+    st.set_page_config(page_title="Cuadro AJPP", page_icon="🎾", layout="wide")
     modern_styles()
 
-    st.markdown('<div class="main-title">AJPP Draw Viewer</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">Cuadro AJPP</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="subtitle">Personal Streamlit page for a modern, readable tournament bracket view.</div>',
+        '<div class="subtitle">Visualización moderna del cuadro del torneo.</div>',
         unsafe_allow_html=True,
     )
 
     with st.sidebar:
-        st.header("Source")
-        url = st.text_input("Draw URL", value=DEFAULT_URL)
-        refresh = st.button("Refresh draw", width="stretch")
-        st.caption("Tip: keep the default URL, or replace it with another AJPP draw page.")
+        st.header("Fuente")
+        url = st.text_input("URL del cuadro", value=DEFAULT_URL)
+        refresh = st.button("Actualizar cuadro", width="stretch")
+        st.caption("Tip: dejá la URL por defecto o reemplazala por otro cuadro AJPP.")
 
     if refresh:
         st.cache_data.clear()
 
     try:
         html = fetch_html(url)
-        matches, full_text = parse_matches(html)
+        matches, _ = parse_matches(html)
         draw_images = extract_draw_images(html, url)
     except requests.RequestException as error:
-        st.error(f"Could not load the webpage: {error}")
+        st.error(f"No se pudo cargar la página: {error}")
         return
 
     if not matches:
-        st.warning("The page loaded but no matches were parsed. You can still open the source URL below.")
-        st.link_button("Open original page", url)
+        st.warning("La página cargó, pero no se pudieron interpretar partidos del cuadro.")
         return
 
     completed = sum(1 for item in matches if item.score)
     scheduled = sum(1 for item in matches if item.schedule)
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Matches parsed", len(matches))
-    col2.metric("Matches with result", completed)
-    col3.metric("Matches with schedule", scheduled)
+    col1.metric("Partidos detectados", len(matches))
+    col2.metric("Partidos con resultado", completed)
+    col3.metric("Partidos con horario", scheduled)
 
-    tab_bracket, tab_images, tab_source = st.tabs(["Bracket", "Draw images", "Source"])
+    tab_bracket, tab_images = st.tabs(["Cuadro", "Imágenes"])
 
     with tab_bracket:
-        st.caption("FIFA-style knockout bracket view.")
+        st.caption("Vista tipo eliminación directa (estilo mundial).")
         render_bracket(matches)
 
     with tab_images:
         if draw_images:
-            st.caption("Official draw images extracted from the AJPP source page.")
+            st.caption("Imágenes oficiales del cuadro extraídas desde la página AJPP.")
             selected_image = st.selectbox(
-                "Choose image",
+                "Elegir imagen",
                 options=draw_images,
                 format_func=lambda item: item.rsplit("/", maxsplit=1)[-1],
             )
@@ -342,13 +341,13 @@ def render_app() -> None:
             if image_bytes:
                 st.image(image_bytes, width="stretch")
             else:
-                st.error("Could not load this image from source. Try another image or refresh.")
+                st.error("No se pudo cargar esta imagen. Probá otra opción o actualizá el cuadro.")
 
-            with st.expander("Show all draw images"):
+            with st.expander("Mostrar todas las imágenes"):
                 load_gallery = st.checkbox(
-                    f"Load gallery ({len(draw_images)} images)",
+                    f"Cargar galería ({len(draw_images)} imágenes)",
                     value=False,
-                    help="Disabled by default to keep the page fast and stable.",
+                    help="Desactivado por defecto para mantener velocidad y estabilidad.",
                 )
                 if load_gallery:
                     for image_url in draw_images:
@@ -360,15 +359,9 @@ def render_app() -> None:
                                 width="stretch",
                             )
                         else:
-                            st.warning(f"Skipped image: {image_url.rsplit('/', maxsplit=1)[-1]}")
+                            st.warning(f"Imagen omitida: {image_url.rsplit('/', maxsplit=1)[-1]}")
         else:
-            st.warning("No draw images were found on this page.")
-
-    with tab_source:
-        st.link_button("Open original page", url)
-        with st.expander("Raw extracted text preview"):
-            st.text_area("Preview", value=full_text[:8000], height=320)
-
+            st.warning("No se encontraron imágenes del cuadro en esta página.")
 
 if __name__ == "__main__":
     render_app()
